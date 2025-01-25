@@ -120,7 +120,7 @@ class CustomSECQueryEngine:
                 context_parts.append(
                     f"[Document Similarity: {sim:.4f}]\n{self.doc_chunks[idx]}"
                 )
-            else:  # table
+            else:  
                 table = self.tables[idx]
                 context_parts.append(
                     f"[Table Similarity: {sim:.4f}]\nTable Type: {table.table_type}\n"
@@ -142,7 +142,6 @@ class CustomSECQueryEngine:
         Focus on providing factual information from the filings only.
         When referring to financial data, please be specific about the numbers and their context."""
         
-        # Use LLM instead of embedding model for completion
         response = self.llm.complete(prompt)
         return response.text
 
@@ -154,10 +153,9 @@ def process_documents(directory: str) -> Tuple[List[Document], List[TableData]]:
     documents = []
     tables = []
     
-    # Walk through the directory
     for root, _, files in os.walk(directory):
         for file in files:
-            if not file.endswith('.pdf'):  # Check for PDF files
+            if not file.endswith('.pdf'):
                 continue
                 
             file_path = os.path.join(root, file)
@@ -193,10 +191,9 @@ def process_documents(directory: str) -> Tuple[List[Document], List[TableData]]:
                         try:
                             # Convert table text to DataFrame
                             rows = [row.split() for row in table_text.strip().split('\n')]
-                            if len(rows) > 1:  # Ensure we have at least 2 rows for a table
+                            if len(rows) > 1: 
                                 df = pd.DataFrame(rows[1:], columns=rows[0])
                                 
-                                # Get context (text before table)
                                 context = text_before[-200:] if text_before else ""
                                 
                                 # Determine table type based on content and context
@@ -219,7 +216,6 @@ def process_documents(directory: str) -> Tuple[List[Document], List[TableData]]:
                                 tables.append(table_data)
                         
                         except Exception as e:
-                            # If table parsing fails, treat as regular text
                             documents.append(Document(text=table_text))
                         
                         current_pos = match.end()
